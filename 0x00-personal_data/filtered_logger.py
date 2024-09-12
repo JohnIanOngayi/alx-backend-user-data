@@ -26,14 +26,17 @@ def filter_datum(
         str : obfuscated message
     """
     pattern = "|".join([f"{field}=[^\\{separator}]*" for field in fields])
-    return re.sub(pattern,
-                  lambda m: f"{m.group(0).split('=')[0]}={redaction}",
-                  message)
+    return re.sub(
+        pattern,
+        lambda m: f"{m.group(0).split('=')[0]}={redaction}",
+        message
+    )
 
 
 def get_logger() -> logging.Logger:
     """returns a logger object"""
-    user_data = logging.Logger("user_data", level=logging.INFO)
+    user_data = logging.getLogger("user_data")
+    user_data.setLevel(logging.INFO)
     formatter = RedactingFormatter(list(PII_FIELDS))
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
