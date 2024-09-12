@@ -46,8 +46,8 @@ def filter_datum(
     """
     pattern = "|".join([f"{field}=[^\\{separator}]*" for field in fields])
     return re.sub(pattern,
-            lambda m: f"{m.group(0).split('=')[0]}={redaction}",
-            message)
+                  lambda m: f"{m.group(0).split('=')[0]}={redaction}",
+                  message)
 
 
 def get_logger() -> logging.Logger:
