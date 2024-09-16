@@ -128,14 +128,12 @@ class BasicAuth(Auth):
         )
         if not base64_authorization_header:
             return
-        decoded_base64_authorization_header = self.decode_base64_authorization_header(
+        decoded_base64 = self.decode_base64_authorization_header(
             base64_authorization_header
         )
-        if not decoded_base64_authorization_header:
+        if not decoded_base64:
             return
-        user_credentials = self.extract_user_credentials(
-            decoded_base64_authorization_header
-        )
+        user_credentials = self.extract_user_credentials(decoded_base64)
         if user_credentials == (None, None):
             return
         return self.user_object_from_credentials(
