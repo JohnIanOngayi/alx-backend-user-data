@@ -2,8 +2,7 @@
 
 """Moduke defines a class BasicAuth"""
 
-from typing import Any, Optional, TypeVar, Union
-from flask import Request
+from typing import Any, TypeVar, Union
 from api.v1.auth.auth import Auth
 from base64 import b64decode
 from models.user import User
@@ -109,7 +108,7 @@ class BasicAuth(Auth):
             return None
         return users[0]
 
-    def current_user(self, request: Optional[Request]) -> TypeVar("User"):
+    def current_user(self, request=None) -> User:
         """
         Overloads Auth and retrieves User instance for the request
 
