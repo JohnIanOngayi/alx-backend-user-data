@@ -3,7 +3,6 @@
 """Moduke defines a class BasicAuth"""
 
 from typing import Any, Optional, TypeVar, Union
-
 from flask import Request
 from api.v1.auth.auth import Auth
 from base64 import b64decode
