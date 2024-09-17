@@ -2,8 +2,8 @@
 """
 Module defines authentication classes
 """
-from flask import Request
-from typing import List, Optional, TypeVar
+from typing import List
+from models.user import User
 
 
 class Auth:
@@ -37,6 +37,6 @@ class Auth:
             return None
         return request.headers.get("Authorization")
 
-    def current_user(self, request: Optional[Request]) -> TypeVar("User"):
-        """function"""
+    def current_user(self, request=None) -> User:
+        """function returns current user attached to session"""
         return None
