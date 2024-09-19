@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Module defines class SessionExpAuth
+"""
+
 from typing import Optional, Union
 from os import getenv
 from flask import request
