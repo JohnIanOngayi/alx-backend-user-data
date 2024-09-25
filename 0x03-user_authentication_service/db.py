@@ -3,7 +3,10 @@
 """
 from typing import Union
 from sqlalchemy import create_engine
-from sqlalchemy.exc import InvalidRequestError, NoResultFound
+from sqlalchemy.exc import InvalidRequestError
+
+# from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
