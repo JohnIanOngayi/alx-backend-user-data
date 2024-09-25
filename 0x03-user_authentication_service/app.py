@@ -31,8 +31,8 @@ def register_user():
         return jsonify({"message": "email already registered"})
     if new_user:
         return jsonify(
-                {"email": f"{new_user.email}", "message": "user created"}
-                )
+            {"email": f"{new_user.email}", "message": "user created"}
+        )
 
 
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
@@ -47,7 +47,7 @@ def login():
     if AUTH.valid_login(email, password):
         resp = make_response(jsonify(
             {"email": f"{email}", "message": "logged in"})
-            )
+                             )
         session_id = AUTH.create_session(email)
         if session_id:
             resp.set_cookie("session_id", session_id)
