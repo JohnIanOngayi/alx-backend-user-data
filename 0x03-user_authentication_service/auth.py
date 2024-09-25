@@ -88,6 +88,6 @@ class Auth:
         return bcrypt.checkpw(password.encode(), hashed_password)
 
     @staticmethod
-    def _generate_uuid():
+    def _generate_uuid() -> str:
         """return uuid's"""
-        return uuid4()
+        return str(uuid4())
