@@ -4,12 +4,9 @@
 from typing import Union
 from sqlalchemy import create_engine
 from sqlalchemy.exc import InvalidRequestError
-
-# from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-
 from user import Base, User
 
 
@@ -52,12 +49,15 @@ class DB:
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """updates user matching user_id with kwargs"""
+        if not set(kwargs.keys()).issubset(set(User.__dict__.keys())):
+            return None
         try:
-            user_kwargs = {"user_id": user_id}
-            user = self.find_user_by(**user_kwargs)
+            user = self.find_user_by(id=user_id)
         except Exception:
             return None
         if user:
-            user.update(kwargs, synchronize_session=False)
+            for k, v in kwargs.items():
+                setattr(user, k, v)
+        self._session.add(user)
         self._session.commit()
         return None

@@ -45,9 +45,9 @@ def login():
     if not email or not password:
         abort(401)
     if AUTH.valid_login(email, password):
-        resp = make_response(jsonify(
-            {"email": f"{email}", "message": "logged in"})
-                             )
+        resp = make_response(
+            jsonify({"email": f"{email}", "message": "logged in"})
+        )
         session_id = AUTH.create_session(email)
         if session_id:
             resp.set_cookie("session_id", session_id)
@@ -82,5 +82,39 @@ def fetch_profile():
     abort(403)
 
 
+@app.route("/reset_password", methods=["POST"], strict_slashes=False)
+def get_reset_password_token():
+    """POST /reset_password
+    returns reset token"""
+    json = request.form.to_dict()
+    email = json.get("email")
+    if email is None:
+        abort(403)
+    try:
+        token = AUTH.get_reset_password_token(email=email)
+    except Exception:
+        abort(403)
+    return jsonify({"email": f"{email}", "reset_token": f"{token}"}), 200
+
+
+@app.route("/reset_password", methods=["PUT"], strict_slashes=False)
+def reset_password():
+    """PUT /reset_password
+    updates the password"""
+    json = request.form.to_dict()
+    email = json.get("email")
+    reset_token = json.get("reset_token")
+    new_password = json.get("new_password")
+    if not email or not reset_token or not new_password:
+        # abort(403)
+        return jsonify({"error": "attr missing"}), 403
+    try:
+        AUTH.update_password(reset_token, new_password)
+    except Exception:
+        # abort(403)
+        return jsonify({"error": "exception raised"}), 403
+    return jsonify({"email": f"{email}", "message": "Password updated"}), 200
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    app.run(host="0.0.0.0", port=5000)

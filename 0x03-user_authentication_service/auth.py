@@ -32,7 +32,7 @@ class Auth:
             pass
         else:
             raise ValueError(f"User {email} already exists")
-        hashed_password = self._hash_password(password)
+        hashed_password = _hash_password(password)
         if hashed_password:
             return self._db.add_user(email, hashed_password.decode())
         return None
@@ -43,7 +43,7 @@ class Auth:
             user = self._db.find_user_by(email=email)
         except Exception:
             return False
-        return self._is_valid(user.hashed_password.encode(), password)
+        return _is_valid(user.hashed_password.encode(), password)
 
     def create_session(self, email: str) -> Union[str, None]:
         """creates session for attached user"""
@@ -52,9 +52,38 @@ class Auth:
         except Exception:
             return None
         if user:
-            session_id = str(self._generate_uuid())
+            session_id = str(_generate_uuid())
             self._db.update_user(user_id=user.id, session_id=session_id)
             return session_id
+        return None
+
+    def get_reset_password_token(self, email: str) -> Union[str, None]:
+        """Generates and updates User password reset token"""
+        if not email or not isinstance(email, str):
+            return None
+        try:
+            user = self._db.find_user_by(email=email)
+        except ValueError:
+            raise ValueError(f"User with email {email} doesn't exist")
+        password_token = _generate_uuid()
+        token_dict = {"password_token": password_token}
+        self._db.update_user(user.id, **token_dict)
+        return password_token
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """Verifies reset password token and updates password"""
+        if not password or len(password) == 0 or not isinstance(password, str):
+            raise ValueError
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+        except Exception:
+            raise ValueError
+        # update password and delete reset_token
+        hashed_password_dict = {
+            "hashed_password": _hash_password(password),
+            "reset_token": None,
+        }
+        self._db.update_user(user.id, **hashed_password_dict)
         return None
 
     def get_user_from_session_id(self, session_id: str) -> Union[User, None]:
@@ -75,19 +104,19 @@ class Auth:
             raise ValueError("user_id not found")
         return self._db.update_user(user_id=user_id, session_id=None)
 
-    @staticmethod
-    def _hash_password(password: str) -> Union[bytes, None]:
-        """hashes a password"""
-        if not password or len(password) == 0:
-            return None
-        return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-    @staticmethod
-    def _is_valid(hashed_password: bytes, password: str) -> bool:
-        """validates password"""
-        return bcrypt.checkpw(password.encode(), hashed_password)
+def _hash_password(password: str) -> Union[bytes, None]:
+    """hashes a password"""
+    if not password or len(password) == 0:
+        return None
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-    @staticmethod
-    def _generate_uuid() -> str:
-        """return uuid's"""
-        return str(uuid4())
+
+def _is_valid(hashed_password: bytes, password: str) -> bool:
+    """validates password"""
+    return bcrypt.checkpw(password.encode(), hashed_password)
+
+
+def _generate_uuid() -> str:
+    """return uuid's"""
+    return str(uuid4())
